@@ -3,6 +3,9 @@ package com.demo.notes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private NoteAdapter adapter;
     private final ArrayList<Note> notes = new ArrayList<>();
-    private NotesDatabase database;
+    private MainViewModel viewModel;
+
+
 
 
 
@@ -36,10 +41,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ActionBar actionBar =getSupportActionBar();
+        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+
         if (actionBar!=null){
             actionBar.hide();
         }
-        database = NotesDatabase.getInstance(this);
+
         getData();
 
         recyclerView = findViewById(R.id.recyclerview);
@@ -78,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                remove(viewHolder.getAdapterPosition());
-               getData();
+
 
             }
         });
@@ -94,15 +101,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getData(){
-        List<Note> notesFromDB = database.notesDao().getAllNotes();
-        notes.clear();
-        notes.addAll(notesFromDB);
+       LiveData<List<Note>> notesFromDB = viewModel.getNotes();
+       notesFromDB.observe(this, new Observer<List<Note>>() {
+           @Override
+           public void onChanged(List<Note> notesFromLiveData) {
+             adapter.setNotes(notesFromLiveData);
+           }
+       });
+
+
     }
 
     private void remove(int position){
-        Note note = notes.get(position);
-        database.notesDao().deleteNote(note);
-        adapter.notifyDataSetChanged();
+        Note note = adapter.getNotes().get(position);
+        viewModel.deleteNote(note);
     }
 
 

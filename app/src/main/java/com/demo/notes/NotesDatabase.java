@@ -13,11 +13,12 @@ public abstract class NotesDatabase extends RoomDatabase {
     private static NotesDatabase notesDatabase;
     private static final Object LOCK = new Object();
 
+
+
     public static NotesDatabase getInstance(Context context){
         synchronized (LOCK) {
             if (notesDatabase == null) {
-                notesDatabase = Room.databaseBuilder(context, NotesDatabase.class, DB_NAME)
-                        .allowMainThreadQueries()
+                            notesDatabase = Room.databaseBuilder(context, NotesDatabase.class, DB_NAME)
                         .build();
             }
         }
