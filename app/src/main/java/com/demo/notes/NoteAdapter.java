@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
     NoteOnClickListener noteOnClickListener;
 
@@ -23,6 +24,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     public void setNoteOnClickListener(NoteOnClickListener noteOnClickListener) {
         this.noteOnClickListener = noteOnClickListener;
     }
+
 
     class NoteViewHolder extends RecyclerView.ViewHolder{
         TextView textViewTitle;
@@ -49,7 +51,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                 }
             });
 
-
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
@@ -64,9 +65,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         }
 
     }
-
-
-
 
 
     private ArrayList<Note> notes;
@@ -87,7 +85,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         Note note = notes.get(position);
         holder.textViewTitle.setText(note.getTitle());
         holder.textViewDescription.setText(note.getDescription());
-        holder.textViewDayOfWeek.setText(note.getDayOfWeek());
+        holder.textViewDayOfWeek.setText(Note.getDayAsString(note.getDayOfWeek()+1));
         int colorId;
         int priority = note.getPriority();
         switch (priority){

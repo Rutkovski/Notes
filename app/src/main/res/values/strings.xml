@@ -7,6 +7,7 @@
     <string name="priority2">2</string>
     <string name="priority3">3</string>
     <string name="button_save_note">Добавить заметку</string>
+    <string name="warning_fill_fields">Все поля должны быть заполнены</string>
     <string-array name="day_of_week">
         <item>Понедельник</item>
         <item>Вторник</item>

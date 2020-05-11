@@ -1,6 +1,7 @@
 package com.demo.notes;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -8,36 +9,40 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
     private RecyclerView recyclerView;
     private NoteAdapter adapter;
+    private final ArrayList<Note> notes = new ArrayList<>();
+    private NotesDatabase database;
 
-    public static final ArrayList<Note> notes = new ArrayList<>();
-    ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = findViewById(R.id.recyclerview);
-
-        if (notes.isEmpty()) {
-            notes.add(new Note("Парикмахер", "Сделать прическу", "Понедельник", 2));
-            notes.add(new Note("Баскетбол", "Игра со школьной командой", "Вторник", 3));
-            notes.add(new Note("Магазин", "Купить новые джинсы", "Понедельник", 3));
-            notes.add(new Note("Стоматолог", "Вылечить зубы", "Понедельник", 2));
-            notes.add(new Note("Парикмахер", "Сделать прическу к выпускному", "Среда", 1));
-            notes.add(new Note("Баскетбол", "Игра со школьной командой", "Вторник", 3));
-            notes.add(new Note("Магазин", "Купить новые джинсы", "Понедельник", 3));
+        ActionBar actionBar =getSupportActionBar();
+        if (actionBar!=null){
+            actionBar.hide();
         }
+        database = NotesDatabase.getInstance(this);
+        getData();
+
+        recyclerView = findViewById(R.id.recyclerview);
 
 
         adapter = new NoteAdapter(notes);
@@ -46,13 +51,14 @@ public class MainActivity extends AppCompatActivity {
         adapter.setNoteOnClickListener(new NoteAdapter.NoteOnClickListener() {
             @Override
             public void click(int i) {
-                notes.add(notes.get(i));
+
                 adapter.notifyDataSetChanged();
             }
 
             @Override
             public void longClick(int i) {
-                notes.remove(i);
+
+
                 adapter.notifyDataSetChanged();
 
             }
@@ -69,7 +75,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
 
-                adapter.notifyDataSetChanged();
+
+
+               remove(viewHolder.getAdapterPosition());
+               getData();
 
             }
         });
@@ -83,6 +92,20 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AddNoteActivity.class);
         startActivity(intent);
     }
+
+    private void getData(){
+        List<Note> notesFromDB = database.notesDao().getAllNotes();
+        notes.clear();
+        notes.addAll(notesFromDB);
+    }
+
+    private void remove(int position){
+        Note note = notes.get(position);
+        database.notesDao().deleteNote(note);
+        adapter.notifyDataSetChanged();
+    }
+
+
 
 }
 
